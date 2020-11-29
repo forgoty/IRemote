@@ -20,8 +20,8 @@ MDNSResponder mdns;
 ESP8266WiFiMulti WiFiMulti;
 
 // Wi-Fi settings
-const char* ssid = "TP-LINK_4978";  // Fix for your network
-const char* password = "78304765";  // Fix for your network
+const char* ssid = "YOUR SSID HERE";  // Fix for your network
+const char* password = "YOUR PASSWORD HERE";  // Fix for your network
 
 IPAddress ip(192, 168, 0, 20);  // Fix for your network
 IPAddress gateway(192, 168, 0, 1);  // Fix for your network
