@@ -2,6 +2,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <IRsend.h>
+#include <FS.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <ESP8266WiFiMulti.h>
@@ -31,12 +32,27 @@ ESP8266WebServer server(80);
 
 IRsend irsend(14); //an IR emitter led is connected to GPIO pin 4
 
+//Index Content Cache
+String IndexContent = "";
+
+//Style Content Cache
+String StyleContent = "";
+
 void setup() {
   Serial.begin(115200);
   delay(10);
 
   // We start by connecting to a WiFi network
   WiFiMulti.addAP(ssid, password);
+
+  // Assume that file system is okay
+  if(!SPIFFS.begin()){
+    Serial.println("An Error has occurred while mounting SPIFFS");
+    return;
+  }
+  // Write Static files to cache
+  writeFileCache("/index.html", &IndexContent);
+  writeFileCache("/style.css", &StyleContent);
 
   Serial.println();
   Serial.println();
@@ -59,48 +75,52 @@ void setup() {
   }
 
   server.on("/", []() {
-    server.send(200, "text/html", webPage());
+    server.send(200, "text/html", IndexContent);
+  });
+
+  server.on("/style.css", []() {
+    server.send(200, "text/css", StyleContent);
   });
 
   server.on("/socketSamsungPower", []() {
     irsend.sendSAMSUNG(SAMSUNG_POWER, 32);
     Serial.println("Samsung Power Pressed");
-    server.send(200, "text/html", webPage());
+    server.send(200, "text/plain", "success");
     delay(500);
   });
 
   server.on("/socketSamsungVolumeUp", []() {
     irsend.sendSAMSUNG(SAMSUNG_VOLUME_UP, 32);
     Serial.println("Samsung Volume Up Pressed");
-    server.send(200, "text/html", webPage());
+    server.send(200, "text/plain", "success");
     delay(500);
   });
 
   server.on("/socketSamsungVolumeDown", []() {
     irsend.sendSAMSUNG(SAMSUNG_VOLUME_DOWN, 32);
     Serial.println("Samsung Volume Down Pressed");
-    server.send(200, "text/html", webPage());
+    server.send(200, "text/plain", "success");
     delay(500);
   });
 
   server.on("/socketPanasonicPower", []() {
     irsend.sendPanasonic(0x4004, PANASONIC_POWER + 0x5000000);
     Serial.println("Panasonic Power Pressed");
-    server.send(200, "text/html", webPage());
+    server.send(200, "text/plain", "success");
     delay(500);
   });
 
   server.on("/socketPanasonicVolumeUp", []() {
     irsend.sendPanasonic(0x4004, PANASONIC_VOLUME_UP + 0x5000000);
     Serial.println("Panasonic Volume Up Pressed");
-    server.send(200, "text/html", webPage());
+    server.send(200, "text/plain", "success");
     delay(500);
   });
 
   server.on("/socketPanasonicVolumeDown", []() {
     irsend.sendPanasonic(0x4004, PANASONIC_VOLUME_DOWN + 0x5000000);
     Serial.println("Panasonic Volume Down Pressed");
-    server.send(200, "text/html", webPage());
+    server.send(200, "text/plain", "success");
     delay(500);
   });
 
@@ -114,16 +134,16 @@ void loop() {
   server.handleClient();
 }
 
-
-String webPage() {
-  String web;
-  web += "<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/> <meta charset=\"utf-8\"><title>Nikitas Cinema Remote System</title><style>button{color:black;padding: 10px 27px;}</style></head>";
-  web += "<p style=\"text-align: center;margin-top: 0px;margin-bottom: 5px;\">Samsung TV Remote</p>";
-  web += "<div style=\"text-align: center;margin: 5px 0px;\"> <a href=\"socketSamsungPower\"><button>Power</button></a>&nbsp;</div>";
-  web += "<div style=\"text-align: center;margin: 5px 0px;\"> <a href=\"socketSamsungVolumeUp\"><button>Volume Up</button></a>&nbsp;<a href=\"socketSamsungVolumeDown\"><button>Volume Down</button></a></div>";
-
-  web += "<p style=\"text-align: center;margin-top: 0px;margin-bottom: 5px;\">Panasonic SA PM-03 Remote</p>";
-  web += "<div style=\"text-align: center;margin: 5px 0px;\"> <a href=\"socketPanasonicPower\"><button>Power</button></a>&nbsp;</div>";
-  web += "<div style=\"text-align: center;margin: 5px 0px;\"> <a href=\"socketPanasonicVolumeUp\"><button>Volume Up</button></a>&nbsp;<a href=\"socketPanasonicVolumeDown\"><button>Volume Down</button></a></div>";
-  return (web);
+// Read file and write content to cache
+void writeFileCache(String path, String* target) {
+  Serial.println("Reading file: " + path);
+  File file = SPIFFS.open(path, "r");
+  if(!file){
+    Serial.println("Failed to open file for reading " + path);
+    return;
+  }
+  while(file.available()){
+    *target = file.readString();
+  }
+  file.close();
 }

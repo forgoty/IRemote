@@ -1,0 +1,33 @@
+<head>
+   <script type="text/javascript">
+	function asyncCall(target) {
+	  var xhr = new XMLHttpRequest()
+	  xhr.open('GET', target)
+	  xhr.send()
+	}
+   </script>
+   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+   <meta charset="utf-8">
+   <link rel="stylesheet" href="style.css">
+   <title>Nikitas IR Remote System</title>
+</head>
+<p style="text-align: center;">Power all devices</p>
+<div style="text-align: center;">
+	<button class="button powerall" onclick="asyncCall('/socketSamsungPower'); asyncCall('/socketPanasonicPower');">Power All</button>
+</div>
+<p style="text-align: center;">Samsung TV Remote</p>
+<div style="text-align: center;">
+	<button class="button power" onclick="asyncCall('/socketSamsungPower');">Power</button>
+</div>
+<div style="text-align: center;">
+	<button class="button volumeup" onclick="asyncCall('/socketSamsungVolumeUp');">Volume Up</button>
+	<button class="button volumedown" onclick="asyncCall('/socketSamsungVolumeDown');">Volume Down</button>
+</div>
+<p style="text-align: center;">Panasonic SA PM-03 Remote</p>
+<div style="text-align: center;">
+	<button class="button power" onclick="asyncCall('/socketPanasonicPower');">Power</button>
+</div>
+<div style="text-align: center;">
+	<button class="button volumeup" onclick="asyncCall('/socketPanasonicVolumeUp');">Volume Up</button>
+	<button class="button volumedown" onclick="asyncCall('/socketPanasonicVolumeDown');">Volume Down</button>
+</div>

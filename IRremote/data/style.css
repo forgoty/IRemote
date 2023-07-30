@@ -1,0 +1,38 @@
+html {
+  font-family: Verdana;
+  display: inline-block;
+  margin: 0px auto;
+  text-align: center;
+  background-color: #282828;
+}
+p {
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+  color: #d79921;
+}
+.button {
+  border: none;
+  border-radius: 4px;
+  color: #fbf1c7;
+  width: 140px;
+  height: 70px;
+  font-size: 15px;
+}
+.button.powerall {
+  background-color: #d65d0e;
+  margin: 2px;
+  padding: 16px 20px;
+  font-size: 20px;
+}
+.button.volumedown {
+  background-color: #ebdbb2;
+  color: #282828;
+}
+.button.volumeup {
+  background-color: #ebdbb2;
+  color: #282828;
+}
+.button.power {
+  background-color: #fb4934;
+  margin-bottom: 20px;
+}
